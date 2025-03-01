@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Page</title>
+    <style>
+        .card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            width: 200px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Page</h1>
+    <input type="text" id="categoryFilter" placeholder="Enter category">
+    <button onclick="filterProducts()">Filter</button>
+    <div id="products"></div>
+
+    <script>
+        function loadProducts(category = '') {
+            fetch(`/products?category=${category}`)
+                .then(response => response.json())
+                .then(data => {
+                    const productsContainer = document.getElementById('products');
+                    productsContainer.innerHTML = '';
+                    data.forEach(product => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+                            <h2>${product.name}</h2>
+                            <p>Price: $${product.price}</p>
+                            <p>${product.description}</p>
+                            <p>Categories: ${product.category.join(', ')}</p>
+                        `;
+                        productsContainer.appendChild(card);
+                    });
+                });
+        }
+
+        function filterProducts() {
+            const category = document.getElementById('categoryFilter').value;
+            loadProducts(category);
+        }
+
+        loadProducts();
+    </script>
+</body>
+</html>

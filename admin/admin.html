@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+</head>
+<body>
+    <h1>Admin Page</h1>
+
+    <!-- Форма добавления товара -->
+    <h2>Add Product</h2>
+    <form id="addProductForm">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="number" id="price" placeholder="Price" required>
+        <input type="text" id="description" placeholder="Description" required>
+        <input type="text" id="category" placeholder="Categories (comma separated)" required>
+        <button type="submit">Add Product</button>
+    </form>
+
+    <!-- Форма удаления товара -->
+    <h2>Delete Product</h2>
+    <input type="number" id="deleteId" placeholder="Enter ID">
+    <button onclick="deleteProduct()">Delete</button>
+
+    <!-- Форма редактирования товара -->
+    <h2>Edit Product</h2>
+    <form id="editProductForm">
+        <input type="number" id="editId" placeholder="Enter ID" required>
+        <input type="text" id="editName" placeholder="Name">
+        <input type="number" id="editPrice" placeholder="Price">
+        <input type="text" id="editDescription" placeholder="Description">
+        <input type="text" id="editCategory" placeholder="Categories (comma separated)">
+        <button type="submit">Edit Product</button>
+    </form>
+    <script>
+        // Добавление товара
+        document.getElementById('addProductForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const product = {
+                name: document.getElementById('name').value,
+                price: parseFloat(document.getElementById('price').value),
+                description: document.getElementById('description').value,
+                category: document.getElementById('category').value
+                    .split(',')
+                    .map(cat => cat.trim())
+                    .filter(cat => cat !== '')
+            };
+            fetch('/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(product)
+            }).then(response => response.json())
+              .then(data => alert('Product added!'))
+              .catch(error => console.error('Error:', error));
+        });
+
+        // Удаление товара
+        function deleteProduct() {
+            const productId = document.getElementById('deleteId').value;
+            fetch(`/products/${productId}`, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.status === 204) {
+                    alert('Product deleted!');
+                } else {
+                    alert('Failed to delete product');
+                }
+            });
+        }
+
+        // Редактирование товара
+        document.getElementById('editProductForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const productId = document.getElementById('editId').value;
+            const updatedProduct = {
+                name: document.getElementById('editName').value,
+                price: parseFloat(document.getElementById('editPrice').value),
+                description: document.getElementById('editDescription').value,
+                category: document.getElementById('editCategory').value
+                    .split(',')
+                    .map(cat => cat.trim())
+                    .filter(cat => cat !== '')
+            };
+            fetch(`/products/${productId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedProduct)
+            }).then(response => response.json())
+              .then(data => alert('Product updated!'))
+              .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
